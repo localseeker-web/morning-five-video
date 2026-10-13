@@ -1,0 +1,57 @@
+{
+  "timezone": "America/Toronto",
+  "sites": [
+    {
+      "id": "ncrnow",
+      "enabled": true,
+      "url": "https://ncrnow.ca",
+      "domain": "ncrnow.ca",
+      "category_id": 853,
+      "fb_token_secret": "NCRNOW_FB_PAGE_TOKEN",
+      "title_lines": ["THE", "MORNING", "FIVE"],
+      "header_title": "THE MORNING FIVE",
+      "outro_tagline": "Five stories. Every morning.",
+      "hashtags": "#Ottawa #OttawaNews #NCR #Canada",
+      "font": "Ubuntu",
+      "weights": {"title": 700, "head": 700, "body": 400, "medium": 500},
+      "colors": {
+        "bg_top": "#042454",
+        "bg_bottom": "#021636",
+        "accent": "#7896C8",
+        "text": "#FFFFFF",
+        "soft": "#ECF0F8",
+        "wave": "#7896C8",
+        "wave_deep": "#3C60A0",
+        "dot_off": "#28426E"
+      },
+      "logo": "assets/ncrnow/logo.png",
+      "music": "assets/ncrnow/music.mp3"
+    },
+    {
+      "id": "theseeker",
+      "enabled": false,
+      "url": "https://theseeker.ca",
+      "domain": "theseeker.ca",
+      "category_id": 5452,
+      "fb_token_secret": "SEEKER_FB_PAGE_TOKEN",
+      "title_lines": ["{n} THINGS", "TO KNOW", "TODAY"],
+      "header_title": "{n} THINGS TO KNOW TODAY",
+      "outro_tagline": "New every morning.",
+      "hashtags": "#Cornwall #CornwallOntario #SDG #Akwesasne",
+      "font": "Inter",
+      "weights": {"title": 800, "head": 700, "body": 400, "medium": 500},
+      "colors": {
+        "bg_top": "#1A1A1A",
+        "bg_bottom": "#0A0A0A",
+        "accent": "#E0262D",
+        "text": "#FFFFFF",
+        "soft": "#ECECEC",
+        "wave": "#CC0006",
+        "wave_deep": "#7A0004",
+        "dot_off": "#3A3A3A"
+      },
+      "logo": "assets/theseeker/logo.png",
+      "music": "assets/theseeker/music.mp3"
+    }
+  ]
+}

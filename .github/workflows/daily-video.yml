@@ -1,0 +1,84 @@
+name: Daily brief videos
+
+on:
+  schedule:
+    # Every 30 minutes from 11:05 to 14:35 UTC (7:05–10:35 a.m. Toronto in summer,
+    # 6:05–9:35 a.m. in winter). Each run only does work once a site's brief is out,
+    # and never posts the same day twice.
+    - cron: "5,35 11-14 * * *"
+  workflow_dispatch:
+    inputs:
+      site:
+        description: "Only this site (ncrnow or theseeker). Blank = all enabled sites."
+        required: false
+        default: ""
+      dry_run:
+        description: "Make the video but don't post it"
+        type: boolean
+        default: true
+      force:
+        description: "Post again even if today's video was already posted"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-video
+  cancel-in-progress: false
+
+jobs:
+  video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      NCRNOW_FB_PAGE_TOKEN: ${{ secrets.NCRNOW_FB_PAGE_TOKEN }}
+      SEEKER_FB_PAGE_TOKEN: ${{ secrets.SEEKER_FB_PAGE_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python packages
+        run: pip install -q pillow beautifulsoup4 requests
+
+      - name: Check for new briefs
+        id: check
+        run: |
+          ARGS=""
+          if [ -n "${{ inputs.site }}" ]; then ARGS="$ARGS --site ${{ inputs.site }}"; fi
+          if [ "${{ inputs.force }}" = "true" ]; then ARGS="$ARGS --force"; fi
+          if [ "${{ inputs.dry_run }}" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          echo "args=$ARGS" >> "$GITHUB_OUTPUT"
+          python -m video.run --check $ARGS
+
+      - name: Install FFmpeg
+        if: steps.check.outputs.pending == 'yes'
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: Make and post videos
+        if: steps.check.outputs.pending == 'yes'
+        run: python -m video.run ${{ steps.check.outputs.args }}
+
+      - name: Keep today's videos for download
+        if: always() && steps.check.outputs.pending == 'yes'
+        uses: actions/upload-artifact@v4
+        with:
+          name: videos-${{ github.run_id }}
+          path: out/
+          retention-days: 14
+          if-no-files-found: ignore
+
+      - name: Remember what was posted
+        if: always() && steps.check.outputs.pending == 'yes'
+        run: |
+          if [ -n "$(git status --porcelain state/)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add state/
+            git commit -m "Record videos posted $(date -u +%F)"
+            git push
+          fi
