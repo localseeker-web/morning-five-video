@@ -108,7 +108,15 @@ def fetch_today(site, today):
     posts = r.json()
     if not posts:
         return None
-    post = posts[0]
+    return from_post(site, posts[0], today)
+
+
+def from_post(site, post, today):
+    """Turn a WordPress REST post object into video data, or None if it isn't today's."""
+    if isinstance(post, list):
+        if not post:
+            return None
+        post = post[0]
     if datetime.fromisoformat(post["date"]).date() != today:
         return None
     stories = parse_brief(post["content"]["rendered"])

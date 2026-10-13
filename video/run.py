@@ -59,6 +59,8 @@ def main():
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--site", default="")
     ap.add_argument("--date", default="", help="YYYY-MM-DD (default: today in the configured timezone)")
+    ap.add_argument("--brief-file", default="",
+                    help="WordPress REST JSON of the brief (a post or a one-item list) instead of fetching it; needs --site")
     a = ap.parse_args()
 
     cfg = load_json(os.path.join(ROOT, "config.json"), {})
@@ -85,7 +87,10 @@ def main():
             print(f"[{sid}] already rendered today (no Facebook key set); skipping")
             continue
         try:
-            data = briefmod.fetch_today(site, today)
+            if a.brief_file:
+                data = briefmod.from_post(site, load_json(a.brief_file, None), today)
+            else:
+                data = briefmod.fetch_today(site, today)
         except Exception as e:
             print(f"[{sid}] could not read the brief: {e}")
             failures.append(sid)
@@ -119,6 +124,9 @@ def main():
             cap = caption(site, data, date_label)
             with open(path.replace(".mp4", ".txt"), "w") as fh:
                 fh.write(cap + "\n")
+            # TikTok doesn't make links clickable, so name the site instead.
+            with open(path.replace(".mp4", "-tiktok.txt"), "w") as fh:
+                fh.write(cap.replace(f"Full brief: {data['link']}", f"Full brief at {site['domain']}") + "\n")
             if a.dry_run:
                 continue
             if not token:
