@@ -1,9 +1,4 @@
 {
-  "2026-10-17": {
-    "ncrnow": {
-      "rendered_only": true
-    }
-  },
   "2026-10-18": {
     "ncrnow": {
       "rendered_only": true
@@ -145,6 +140,11 @@
     }
   },
   "2026-11-15": {
+    "ncrnow": {
+      "rendered_only": true
+    }
+  },
+  "2026-11-16": {
     "ncrnow": {
       "rendered_only": true
     }
